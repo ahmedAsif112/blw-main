@@ -1,6 +1,9 @@
 'use client';
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
+import pumpkin from "@/assets/Pumpkin.jpg"
+import peas from "@/assets/peas.jpeg"
+import eggs from "@/assets/eggs.jpg"
 import { Button, Card, Typography, Row, Col, Space, Rate, Timeline, Divider } from 'antd';
 import {
   HeartFilled,
@@ -160,9 +163,27 @@ const LittleBitesLanding = () => {
   ], []);
 
   const recipes = useMemo(() => [
-    { name: "Pumpkin Pie Toast", image: "https://images.unsplash.com/photo-1571167177587-9e99e5e6daa1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Easy", time: "10 min", age: "6+ months" },
-    { name: "Minty Peas", image: "https://images.unsplash.com/photo-1581947419624-7b39a55b78e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Easy", time: "8 min", age: "6+ months" },
-    { name: "Cheesy Egg Triangles", image: "https://images.unsplash.com/photo-1525755662312-1d1f3c201195?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Medium", time: "15 min", age: "8+ months" },
+    {
+      name: "Pumpkin Pie Toast",
+      image: pumpkin,
+      difficulty: "Easy",
+      time: "10 min",
+      age: "6+ months"
+    },
+    {
+      name: "Minty Peas",
+      image: peas,
+      difficulty: "Easy",
+      time: "8 min",
+      age: "6+ months"
+    },
+    {
+      name: "Cheesy Egg Triangles",
+      image: eggs,
+      difficulty: "Medium",
+      time: "15 min",
+      age: "8+ months"
+    },
     { name: "Baby's First Chickpea Curry", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Medium", time: "20 min", age: "10+ months" },
     { name: "Baked Apple Wedges", image: "https://images.unsplash.com/photo-1590005354167-6da97870c757?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Easy", time: "25 min", age: "6+ months" },
     { name: "Easy Chicken Soup", image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Medium", time: "30 min", age: "12+ months" }
@@ -596,12 +617,23 @@ const LittleBitesLanding = () => {
                   className="border-0 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 group overflow-hidden"
                   cover={
                     <div className="relative overflow-hidden">
-                      <img
-                        src={recipe.image}
-                        alt={recipe.name}
-                        className="h-48 sm:h-56 w-full object-cover group-hover:scale-110 transition-all duration-500"
-                        loading="lazy"
-                      />
+                      {typeof recipe.image === 'string' ? (
+                        <img
+                          src={recipe.image}
+                          alt={recipe.name}
+                          className="h-48 sm:h-56 w-full object-cover group-hover:scale-110 transition-all duration-500"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Image
+                          src={recipe.image}
+                          alt={recipe.name}
+                          className="h-48 sm:h-56 w-full object-cover group-hover:scale-110 transition-all duration-500"
+                          width={400}
+                          height={300}
+                          style={{ objectFit: 'cover' }}
+                        />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
                     </div>
                   }
@@ -770,16 +802,9 @@ const LittleBitesLanding = () => {
                   <div className="space-y-3">
                     <div className="text-gray-400">
                       <strong className="text-white">Email:</strong><br />
-                      support@littlebites.com
+                      communityblw@gmail.com
                     </div>
-                    <div className="text-gray-400">
-                      <strong className="text-white">Phone:</strong><br />
-                      1-800-BABY-FOOD
-                    </div>
-                    <div className="text-gray-400">
-                      <strong className="text-white">Hours:</strong><br />
-                      Mon-Fri 9AM-6PM EST
-                    </div>
+
                   </div>
                 </Col>
               </Row>

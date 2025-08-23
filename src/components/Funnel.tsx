@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Heart, Car, Calendar, Book, Shield, Crown, Rocket, Sparkles, Star } from 'lucide-react';
-
+import { useRouter } from "next/navigation";
 interface Particle {
     id: number;
     x: number;
@@ -40,6 +40,10 @@ const BabyNutritionFunnel = () => {
     const [particles, setParticles] = useState<Particle[]>([]);
     const [celebrationMode, setCelebrationMode] = useState<boolean>(false);
 
+    const router = useRouter();
+    const handleSelect = () => {
+        router.push("/signup");
+    };
     // Define questions array at the top
     const questions: Question[] = [
         {
@@ -695,7 +699,10 @@ const BabyNutritionFunnel = () => {
                             We’re preparing your personalized nutrition guide...
                         </p>
 
-                        <button className="group relative inline-flex items-center space-x-2 sm:space-x-3 px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-r from-pink-500 via-violet-500 to-cyan-500 text-white text-lg sm:text-xl font-semibold rounded-full shadow-2xl shadow-pink-500/30 hover:shadow-pink-500/50 transform hover:scale-105 transition-all duration-500 overflow-hidden">
+                        <button onClick={() => {
+
+                            handleSelect();
+                        }} className="group relative inline-flex items-center space-x-2 sm:space-x-3 px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-r from-pink-500 via-violet-500 to-cyan-500 text-white text-lg sm:text-xl font-semibold rounded-full shadow-2xl shadow-pink-500/30 hover:shadow-pink-500/50 transform hover:scale-105 transition-all duration-500 overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-violet-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             <Rocket className="w-5 h-5 sm:w-6 sm:h-6 relative z-10 group-hover:animate-bounce" />
                             <span className="relative z-10">Get My Personalized Guide</span>

@@ -38,7 +38,7 @@ Here you can Download
   data: {
     email,
     status: 'Delivered',
-    site:"Carnivore" // // ✅ include status here
+    site:"BLW" // // ✅ include status here
   },
 });
 
