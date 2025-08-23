@@ -11,13 +11,13 @@ import {
   CheckCircleFilled,
   SmileFilled,
   RocketFilled,
-  MenuOutlined,
   DownloadOutlined,
   AppleOutlined,
   AndroidOutlined,
   ShoppingCartOutlined,
   TrophyOutlined
 } from '@ant-design/icons';
+import { Menu, X, Sparkles, Heart, Star } from 'lucide-react';
 import mother from "@/assets/Mother.png"
 import steps from "@/assets/Steps.png"
 import Image from 'next/image';
@@ -30,6 +30,8 @@ const LittleBitesLanding = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
 
   const router = useRouter();
 
@@ -38,6 +40,7 @@ const LittleBitesLanding = () => {
     const y = window.scrollY;
     if (Math.abs(y - scrollY) > 5) { // Only update if significant change
       setScrollY(y);
+      setScrolled(y > 20);
     }
   }, [scrollY]);
 
@@ -59,6 +62,7 @@ const LittleBitesLanding = () => {
 
     return () => window.removeEventListener('scroll', scrollHandler);
   }, [handleScroll]);
+
   const handleSelect = useCallback(() => {
     router.push("/funnel");
   }, [router]);
@@ -178,6 +182,8 @@ const LittleBitesLanding = () => {
     third: { transform: `translateY(${scrollY * -0.1}px)` }
   }), [scrollY]);
 
+  const menuItems = ['Home', 'About', 'Recipes', 'Contact'];
+
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 flex items-center justify-center">
@@ -209,82 +215,148 @@ const LittleBitesLanding = () => {
         />
       </div>
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-xl z-50 border-b border-pink-100 shadow-lg transition-all duration-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3 group cursor-pointer">
-              <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
-                <span className="text-white font-bold text-lg">🍼</span>
-              </div>
-              <Text className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-                Little Bites
-              </Text>
-            </div>
-
-            {/* Desktop Menu */}
-            <Space className="hidden lg:flex" size="large">
-              {['Home', 'About', 'Recipes', 'Contact'].map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="relative text-gray-700 hover:text-pink-500 transition-all duration-300 font-medium group px-2 py-1"
-                >
-                  {item}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-400 to-rose-400 transition-all duration-300 group-hover:w-full rounded-full"></span>
-                </a>
-              ))}
-            </Space>
-
-            <div className="flex items-center space-x-4">
-              <Button
-                onClick={handleSelect}
-                type="primary"
-                size="large"
-                className="hidden sm:flex bg-gradient-to-r from-pink-500 to-rose-500 border-none shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-full"
-                icon={<RocketFilled />}
-              >
-                Get Started
-              </Button>
-              <Button
-                className="lg:hidden"
-                type="text"
-                icon={<MenuOutlined />}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              />
-            </div>
-          </div>
+      {/* Enhanced Navigation Header */}
+      <>
+        {/* Magical Background Elements */}
+        <div className="fixed top-0 left-0 w-full h-32 overflow-hidden pointer-events-none z-40">
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-pink-200/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -top-5 right-1/4 w-32 h-32 bg-rose-200/20 rounded-full blur-2xl animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}></div>
+          <div className="absolute top-0 right-10 w-24 h-24 bg-purple-200/25 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-pink-100 shadow-lg">
-            <div className="px-4 py-4 space-y-4">
-              {['Home', 'About', 'Recipes', 'Contact'].map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="block text-gray-700 hover:text-pink-500 transition-colors duration-300 font-medium py-2"
-                  onClick={() => setMobileMenuOpen(false)}
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ease-out ${scrolled
+          ? 'bg-white/95 backdrop-blur-2xl shadow-2xl shadow-pink-500/10 border-b border-pink-200/50'
+          : 'bg-white/80 backdrop-blur-xl border-b border-pink-100/30'
+          }`}>
+
+          {/* Animated top border */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-400 via-rose-400 via-purple-400 to-pink-400 bg-size-200 animate-gradient"></div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-20">
+
+              {/* Logo Section with Enhanced Animation */}
+              <div className="flex items-center space-x-4 group cursor-pointer relative">
+                {/* Magical sparkles around logo */}
+                <div className="absolute -top-2 -left-2 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                  <Sparkles className="w-4 h-4 text-pink-400 animate-pulse" />
+                </div>
+                <div className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 transition-all duration-700">
+                  <Star className="w-3 h-3 text-rose-400 animate-spin" style={{ animationDuration: '3s' }} />
+                </div>
+
+                <div className="relative">
+                  {/* Animated ring behind logo */}
+                  <div className="absolute inset-0 w-14 h-14 bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 rounded-full opacity-0 group-hover:opacity-30 scale-75 group-hover:scale-110 transition-all duration-500 blur-sm"></div>
+
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-400 via-rose-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-pink-500/40 group-hover:shadow-3xl group-hover:shadow-pink-500/60 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 relative overflow-hidden">
+                    {/* Shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <span className="text-white font-bold text-xl relative z-10">🍼</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent group-hover:from-pink-600 group-hover:via-rose-600 group-hover:to-purple-700 transition-all duration-500">
+                    Little Bites
+                  </h1>
+                  <p className="text-xs text-gray-500 group-hover:text-pink-500 transition-colors duration-300 -mt-1">Nourishing little ones</p>
+                </div>
+              </div>
+
+              {/* Desktop Menu with Enhanced Animations */}
+              <div className="hidden lg:flex items-center space-x-8">
+                {menuItems.map((item, index) => (
+                  <a
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    className="relative text-gray-700 hover:text-pink-600 transition-all duration-400 font-medium group px-3 py-2"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <span className="relative z-10">{item}</span>
+
+                    {/* Animated underline */}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-400 group-hover:w-full rounded-full"></span>
+
+                    {/* Hover background */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 -z-10"></span>
+
+                    {/* Floating hearts on hover */}
+                    <Heart className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-3 h-3 text-pink-400 opacity-0 group-hover:opacity-100 group-hover:-translate-y-2 transition-all duration-500" />
+                  </a>
+                ))}
+              </div>
+
+              {/* Enhanced CTA Button */}
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={handleSelect}
+                  className="hidden sm:flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 text-white font-semibold rounded-full shadow-2xl shadow-pink-500/40 hover:shadow-3xl hover:shadow-pink-500/60 transform hover:scale-105 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden group"
                 >
-                  {item}
-                </a>
-              ))}
-              <Button
-                onClick={handleSelect}
-                type="primary"
-                className="w-full bg-gradient-to-r from-pink-500 to-rose-500 border-none shadow-lg rounded-full"
-                icon={<RocketFilled />}
-              >
-                Get Started
-              </Button>
+                  {/* Animated background */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+                  <Sparkles className="w-5 h-5 relative z-10 group-hover:animate-pulse" />
+                  <span className="relative z-10">Get Started</span>
+                </button>
+
+                {/* Mobile Menu Button */}
+                <button
+                  className="lg:hidden p-3 rounded-xl bg-gradient-to-r from-pink-100 to-rose-100 hover:from-pink-200 hover:to-rose-200 transition-all duration-300 hover:scale-110"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                  {mobileMenuOpen ? (
+                    <X className="w-6 h-6 text-pink-600" />
+                  ) : (
+                    <Menu className="w-6 h-6 text-pink-600" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        )}
-      </nav>
+
+          {/* Enhanced Mobile Menu */}
+          <div className={`lg:hidden overflow-hidden transition-all duration-500 ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+            <div className="bg-white/95 backdrop-blur-xl border-t border-pink-200/50 shadow-inner">
+              <div className="px-6 py-6 space-y-4">
+                {menuItems.map((item, index) => (
+                  <a
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    className="block text-gray-700 hover:text-pink-600 transition-all duration-300 font-medium py-3 px-4 rounded-xl hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 hover:scale-105 transform"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      animationDelay: `${index * 100}ms`,
+                      animation: mobileMenuOpen ? 'slideInUp 0.5s ease-out forwards' : ''
+                    }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full"></div>
+                      <span>{item}</span>
+                    </div>
+                  </a>
+                ))}
+
+                <button
+                  onClick={handleSelect}
+                  className="w-full mt-4 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-rose-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <Sparkles className="w-5 h-5 relative z-10" />
+                  <span className="relative z-10">Get Started</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </>
 
       {/* Hero Section */}
-      <section id="home" className="min-h-screen flex items-center pt-16 relative z-10">
+      <section id="home" className="min-h-screen flex items-center pt-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Row gutter={[32, 48]} align="middle">
             <Col lg={12} md={24} xs={24}>
@@ -733,7 +805,7 @@ const LittleBitesLanding = () => {
         </div>
       </footer>
 
-      {/* Optimized CSS */}
+      {/* Enhanced CSS with new animations */}
       <style jsx>{`
         /* Performance optimizations */
         .will-change-transform {
@@ -749,7 +821,7 @@ const LittleBitesLanding = () => {
           }
         }
 
-        /* Optimize animations */
+        /* Enhanced animations */
         @keyframes fadeInUp {
           from { transform: translateY(20px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
@@ -758,6 +830,31 @@ const LittleBitesLanding = () => {
         @keyframes pulse {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.05); }
+        }
+
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 3s ease infinite;
+        }
+        
+        .bg-size-200 {
+          background-size: 200% 200%;
         }
 
         /* Custom scrollbar */
