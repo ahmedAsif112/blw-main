@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: 'price_1RzQZ1BTtdntfEmTdKkX56kv', // ✅ make sure this price ID is correct
+          price: 'price_1RzQgZBTtdntfEmTBFU3bdlL', // ✅ make sure this price ID is correct
           quantity: 1,
         },
       ],
