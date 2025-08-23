@@ -1,6 +1,7 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { Button, Card, Typography, Row, Col, Space, Avatar, Rate, Timeline, Carousel, Divider } from 'antd';
+import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
+import { Button, Card, Typography, Row, Col, Space, Rate, Timeline, Divider } from 'antd';
 import {
   HeartFilled,
   SafetyCertificateFilled,
@@ -14,17 +15,13 @@ import {
   DownloadOutlined,
   AppleOutlined,
   AndroidOutlined,
-  GiftOutlined,
-  ThunderboltFilled,
-  TrophyFilled,
-  BulbFilled,
   ShoppingCartOutlined,
-  LeftOutlined,
-  RightOutlined
+  TrophyOutlined
 } from '@ant-design/icons';
 import mother from "@/assets/Mother.png"
 import steps from "@/assets/Steps.png"
 import Image from 'next/image';
+
 const { Title, Paragraph, Text } = Typography;
 
 const LittleBitesLanding = () => {
@@ -32,36 +29,73 @@ const LittleBitesLanding = () => {
   const [scrollY, setScrollY] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const router = useRouter();
+
+  // Throttled scroll handler
+  const handleScroll = useCallback(() => {
+    const y = window.scrollY;
+    if (Math.abs(y - scrollY) > 5) { // Only update if significant change
+      setScrollY(y);
+    }
+  }, [scrollY]);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    // Debounce scroll events
+    let ticking = false;
+    const scrollHandler = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
 
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    setIsLoaded(true);
+
+    return () => window.removeEventListener('scroll', scrollHandler);
+  }, [handleScroll]);
+  const handleSelect = useCallback(() => {
+    router.push("/funnel");
+  }, [router]);
+
+  // Optimize intersection observer
   useEffect(() => {
+    if (!isLoaded) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
+        const updates: { [key: string]: boolean } = {}; // ✅ type here
+
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setIsVisible(prev => ({
-              ...prev,
-              [entry.target.id]: true
-            }));
+            updates[entry.target.id] = true;
           }
         });
+
+        if (Object.keys(updates).length > 0) {
+          setIsVisible((prev) => ({ ...prev, ...updates }));
+        }
       },
-      { threshold: 0.1 }
+      {
+        threshold: 0.1,
+        rootMargin: "50px", // preload elements slightly before they come into view
+      }
     );
 
-    document.querySelectorAll('[data-animate]').forEach((el) => {
-      observer.observe(el);
-    });
+    const elements = document.querySelectorAll("[data-animate]");
+    elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [isLoaded]);
 
-  const features = [
+
+  // Memoize static data
+  const features = useMemo(() => [
     {
       icon: <HeartFilled className="text-4xl text-pink-500" />,
       title: "Age-Appropriate Guidance",
@@ -80,9 +114,9 @@ const LittleBitesLanding = () => {
       description: "From purees to finger foods, discover natural and irresistible recipes for every stage.",
       color: "from-purple-400 to-indigo-400"
     }
-  ];
+  ], []);
 
-  const testimonials = [
+  const testimonials = useMemo(() => [
     {
       name: "Sarah Johnson",
       text: "This guide transformed how I approach feeding my baby. The recipes are simple yet nutritious!",
@@ -119,52 +153,59 @@ const LittleBitesLanding = () => {
       rating: 5,
       location: "Vancouver, Canada"
     }
-  ];
+  ], []);
 
-  const recipes = [
+  const recipes = useMemo(() => [
     { name: "Pumpkin Pie Toast", image: "https://images.unsplash.com/photo-1571167177587-9e99e5e6daa1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Easy", time: "10 min", age: "6+ months" },
     { name: "Minty Peas", image: "https://images.unsplash.com/photo-1581947419624-7b39a55b78e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Easy", time: "8 min", age: "6+ months" },
     { name: "Cheesy Egg Triangles", image: "https://images.unsplash.com/photo-1525755662312-1d1f3c201195?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Medium", time: "15 min", age: "8+ months" },
     { name: "Baby's First Chickpea Curry", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Medium", time: "20 min", age: "10+ months" },
     { name: "Baked Apple Wedges", image: "https://images.unsplash.com/photo-1590005354167-6da97870c757?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Easy", time: "25 min", age: "6+ months" },
     { name: "Easy Chicken Soup", image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", difficulty: "Medium", time: "30 min", age: "12+ months" }
-  ];
+  ], []);
 
-  const stats = [
+  const stats = useMemo(() => [
     { number: "50K+", label: "Happy Families", icon: <SmileFilled /> },
     { number: "200+", label: "Tested Recipes", icon: <BookFilled /> },
-    { number: "98%", label: "Success Rate", icon: <TrophyFilled /> },
+    { number: "98%", label: "Success Rate", icon: <TrophyOutlined /> },
     { number: "24/7", label: "Expert Support", icon: <HeartFilled /> }
-  ];
+  ], []);
 
-  // Custom carousel navigation
-  const CarouselArrow = ({ direction, onClick, disabled }: any) => (
-    <Button
-      className={`absolute top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 rounded-full shadow-lg border-0 
-                 ${direction === 'prev' ? 'left-4' : 'right-4'}
-                 ${disabled ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-pink-500 hover:bg-pink-50 hover:text-pink-600 hover:scale-110'}
-                 transition-all duration-300`}
-      icon={direction === 'prev' ? <LeftOutlined /> : <RightOutlined />}
-      onClick={onClick}
-      disabled={disabled}
-    />
-  );
+  // Memoize expensive transforms
+  const backgroundTransforms = useMemo(() => ({
+    first: { transform: `translateY(${scrollY * 0.1}px)` },
+    second: { transform: `translateY(${scrollY * 0.15}px)` },
+    third: { transform: `translateY(${scrollY * -0.1}px)` }
+  }), [scrollY]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center shadow-lg animate-pulse mb-4 mx-auto">
+            <span className="text-white font-bold text-2xl">🍼</span>
+          </div>
+          <Text className="text-xl font-semibold text-gray-600">Loading Little Bites...</Text>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 overflow-x-hidden">
-      {/* Floating Background Elements */}
+      {/* Optimized Floating Background Elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div
-          className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-r from-pink-200 to-rose-200 rounded-full opacity-20 blur-xl"
-          style={{ transform: `translateY(${scrollY * 0.1}px)` }}
+          className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-r from-pink-200 to-rose-200 rounded-full opacity-20 blur-xl will-change-transform"
+          style={backgroundTransforms.first}
         />
         <div
-          className="absolute top-40 left-10 w-24 h-24 bg-gradient-to-r from-purple-200 to-pink-200 rounded-full opacity-30 blur-lg"
-          style={{ transform: `translateY(${scrollY * 0.15}px)` }}
+          className="absolute top-40 left-10 w-24 h-24 bg-gradient-to-r from-purple-200 to-pink-200 rounded-full opacity-30 blur-lg will-change-transform"
+          style={backgroundTransforms.second}
         />
         <div
-          className="absolute bottom-40 right-20 w-40 h-40 bg-gradient-to-r from-rose-200 to-pink-200 rounded-full opacity-15 blur-2xl"
-          style={{ transform: `translateY(${scrollY * -0.1}px)` }}
+          className="absolute bottom-40 right-20 w-40 h-40 bg-gradient-to-r from-rose-200 to-pink-200 rounded-full opacity-15 blur-2xl will-change-transform"
+          style={backgroundTransforms.third}
         />
       </div>
 
@@ -183,7 +224,7 @@ const LittleBitesLanding = () => {
 
             {/* Desktop Menu */}
             <Space className="hidden lg:flex" size="large">
-              {['Home', 'About', 'Guides', 'Recipes', 'Contact'].map((item) => (
+              {['Home', 'About', 'Recipes', 'Contact'].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
@@ -197,6 +238,7 @@ const LittleBitesLanding = () => {
 
             <div className="flex items-center space-x-4">
               <Button
+                onClick={handleSelect}
                 type="primary"
                 size="large"
                 className="hidden sm:flex bg-gradient-to-r from-pink-500 to-rose-500 border-none shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-full"
@@ -218,7 +260,7 @@ const LittleBitesLanding = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-pink-100 shadow-lg">
             <div className="px-4 py-4 space-y-4">
-              {['Home', 'About', 'Guides', 'Recipes', 'Contact'].map((item) => (
+              {['Home', 'About', 'Recipes', 'Contact'].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
@@ -229,6 +271,7 @@ const LittleBitesLanding = () => {
                 </a>
               ))}
               <Button
+                onClick={handleSelect}
                 type="primary"
                 className="w-full bg-gradient-to-r from-pink-500 to-rose-500 border-none shadow-lg rounded-full"
                 icon={<RocketFilled />}
@@ -246,8 +289,8 @@ const LittleBitesLanding = () => {
           <Row gutter={[32, 48]} align="middle">
             <Col lg={12} md={24} xs={24}>
               <div className="flex flex-col gap-4 text-center lg:text-left">
-                <div className="mb-6 animate-pulse">
-                  <span className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-pink-100 to-rose-100 text-pink-600 font-semibold text-sm">
+                <div className="mb-6">
+                  <span className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-pink-100 to-rose-100 text-pink-600 font-semibold text-sm animate-pulse">
                     🎉 Trusted by 50,000+ Parents
                   </span>
                 </div>
@@ -258,12 +301,11 @@ const LittleBitesLanding = () => {
                   style={{
                     background: 'linear-gradient(135deg, #1f2937, #374151)',
                     WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    animationDelay: '0.2s'
+                    WebkitTextFillColor: 'transparent'
                   }}
                 >
                   We Provide{' '}
-                  <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent animate-pulse">
+                  <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
                     Best Nutrition
                   </span>{' '}
                   For Your Baby
@@ -276,6 +318,7 @@ const LittleBitesLanding = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
                   <Button
+                    onClick={handleSelect}
                     type="primary"
                     size="large"
                     className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-pink-500 to-rose-500 border-none shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 rounded-full"
@@ -316,8 +359,10 @@ const LittleBitesLanding = () => {
                 <div className="relative group">
                   <Image
                     src={mother}
-                    alt='mother'
-                    className="w-full h-96 sm:h-[500px] object-cover  transform group-hover:scale-105 transition-all duration-500"
+                    alt='Mother with baby - Little Bites nutrition guide'
+                    className="w-full h-96 sm:h-[500px] object-cover rounded-3xl shadow-2xl transform group-hover:scale-105 transition-all duration-500"
+                    priority
+                    placeholder="blur"
                   />
 
                   {/* Floating Elements */}
@@ -389,7 +434,7 @@ const LittleBitesLanding = () => {
       </section>
 
       {/* About Section */}
-      <section className="py-20 bg-white relative z-10">
+      <section id="about" className="py-20 bg-white relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Row gutter={[48, 48]} align="middle">
             <Col lg={12} md={24} xs={24} order={2} className="lg:order-1">
@@ -449,8 +494,8 @@ const LittleBitesLanding = () => {
               <div className="relative" data-animate id="about-image">
                 <Image
                   src={steps}
-                  alt="Baby Led Weaning - Family Mealtime"
-                  className=" w-full h-80 sm:h-96 object-cover rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-500"
+                  alt="Baby Led Weaning - Family Mealtime Steps"
+                  className="w-full h-80 sm:h-96 object-cover rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-500"
                 />
                 {/* Overlay text if needed */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl"></div>
@@ -461,7 +506,7 @@ const LittleBitesLanding = () => {
       </section>
 
       {/* Recipe Gallery */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-rose-50 relative z-10">
+      <section id="recipes" className="py-20 bg-gradient-to-br from-pink-50 to-rose-50 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16" data-animate id="recipes-header">
             <Title level={2} className="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">
@@ -483,6 +528,7 @@ const LittleBitesLanding = () => {
                         src={recipe.image}
                         alt={recipe.name}
                         className="h-48 sm:h-56 w-full object-cover group-hover:scale-110 transition-all duration-500"
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
                     </div>
@@ -510,104 +556,33 @@ const LittleBitesLanding = () => {
         </div>
       </section>
 
-      {/* Enhanced Testimonials Slider */}
-      <section className="py-20 bg-white relative z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16" data-animate id="testimonials-header">
-            <Title level={2} className="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">
-              What <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">Parents</span> Are Saying
-            </Title>
-            <Paragraph className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Join thousands of happy families who have transformed their baby’s nutrition journey
-            </Paragraph>
-          </div>
+      {/* Lazy-loaded Testimonials */}
+      <Suspense fallback={<div className="py-20 bg-white text-center">Loading testimonials...</div>}>
+        <section className="py-20 bg-white relative z-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Title level={2} className="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">
+                What <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">Parents</span> Are Saying
+              </Title>
+            </div>
 
-          <div className="relative testimonial-carousel-container">
-            <Carousel
-              autoplay
-              autoplaySpeed={4000}
-              dots={true}
-              infinite={true}
-              speed={800}
-              slidesToShow={3}
-              slidesToScroll={1}
-              pauseOnHover={true}
-              afterChange={(current) => setCurrentSlide(current)}
-              responsive={[
-                {
-                  breakpoint: 1024,
-                  settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                  }
-                },
-                {
-                  breakpoint: 768,
-                  settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                  }
-                }
-              ]}
-              className="testimonial-carousel"
-            >
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="px-4">
-                  <Card className="text-center border-0 shadow-xl h-full bg-gradient-to-br from-white to-pink-50 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 group mx-2">
-                    <div className="relative">
-
-                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100">
-                        <StarFilled className="text-white text-xs" />
-                      </div>
-                    </div>
-
-                    <div className="relative mb-6">
-                      <div className="absolute -top-4 -left-4 text-6xl text-pink-200 opacity-50 font-serif"></div>
-                      <Paragraph className="text-base sm:text-lg text-gray-600 italic leading-relaxed relative z-10 px-4">
-                        {testimonial.text}
-                      </Paragraph>
-                      <div className="absolute -bottom-4 -right-4 text-6xl text-pink-200 opacity-50 font-serif rotate-180"></div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Title level={4} className="text-gray-800 mb-1 text-lg font-semibold">{testimonial.name}</Title>
-                      <Text className="text-gray-500 text-sm mb-3 block">{testimonial.location}</Text>
-                      <Rate
-                        disabled
-                        defaultValue={testimonial.rating}
-                        className="text-pink-400 transform group-hover:scale-110 transition-all duration-300"
-                      />
-                    </div>
-
-                    {/* Animated background elements */}
-                    <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-r from-pink-100 to-rose-100 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0"></div>
-                    <div className="absolute bottom-4 left-4 w-8 h-8 bg-gradient-to-r from-rose-100 to-pink-100 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 transform -translate-x-4 group-hover:translate-x-0"></div>
+            <Row gutter={[24, 24]}>
+              {testimonials.slice(0, 3).map((testimonial, index) => (
+                <Col lg={8} md={12} xs={24} key={index}>
+                  <Card className="text-center border-0 shadow-xl h-full bg-gradient-to-br from-white to-pink-50 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500">
+                    <Paragraph className="text-base sm:text-lg text-gray-600 italic leading-relaxed mb-6">
+                      {testimonial.text}
+                    </Paragraph>
+                    <Title level={4} className="text-gray-800 mb-1 text-lg font-semibold">{testimonial.name}</Title>
+                    <Text className="text-gray-500 text-sm mb-3 block">{testimonial.location}</Text>
+                    <Rate disabled defaultValue={testimonial.rating} className="text-pink-400" />
                   </Card>
-                </div>
+                </Col>
               ))}
-            </Carousel>
-
-            {/* Custom progress indicator */}
-            <div className="flex justify-center mt-8 space-x-2">
-              {Array.from({ length: Math.ceil(testimonials.length / 3) }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${Math.floor(currentSlide / 3) === index
-                    ? 'bg-gradient-to-r from-pink-400 to-rose-400 scale-125 shadow-lg'
-                    : 'bg-gray-300 hover:bg-pink-300'
-                    }`}
-                />
-              ))}
-            </div>
-
-            {/* Floating testimonial count */}
-            <div className="absolute top-0 right-0 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg animate-pulse">
-              <HeartFilled className="mr-1" />
-              Happy Parents
-            </div>
+            </Row>
           </div>
-        </div>
-      </section>
+        </section>
+      </Suspense>
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-pink-500 to-rose-500 text-white relative overflow-hidden z-10">
@@ -618,7 +593,7 @@ const LittleBitesLanding = () => {
           <div data-animate id="cta-content">
             <div className="mb-6">
               <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 text-white font-semibold text-sm backdrop-blur-sm">
-                🎁 Limited Time Offer - 50% OFF
+                Limited Time Offer - 50% OFF
               </span>
             </div>
 
@@ -637,7 +612,6 @@ const LittleBitesLanding = () => {
               >
                 Get Your Guide Now - $33.99
               </Button>
-
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 text-sm text-pink-100">
@@ -659,7 +633,7 @@ const LittleBitesLanding = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16 relative z-10">
+      <footer id="contact" className="bg-gray-900 text-white py-16 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Row gutter={[48, 48]}>
             <Col lg={8} md={24} xs={24}>
@@ -696,7 +670,7 @@ const LittleBitesLanding = () => {
                 <Col md={8} sm={12} xs={24}>
                   <Title level={4} className="text-white mb-4 text-lg">Quick Links</Title>
                   <div className="space-y-3">
-                    {['Home', 'About', 'Guides', 'Recipes', 'Contact'].map((link) => (
+                    {['Home', 'About', 'Recipes', 'Contact'].map((link) => (
                       <div key={link}>
                         <a href={`#${link.toLowerCase()}`} className="text-gray-400 hover:text-pink-400 transition-colors duration-300 block">
                           {link}
@@ -759,366 +733,67 @@ const LittleBitesLanding = () => {
         </div>
       </footer>
 
-      {/* Enhanced Custom Styles */}
+      {/* Optimized CSS */}
       <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          25% { transform: translateY(-10px) rotate(1deg); }
-          50% { transform: translateY(-20px) rotate(0deg); }
-          75% { transform: translateY(-10px) rotate(-1deg); }
+        /* Performance optimizations */
+        .will-change-transform {
+          will-change: transform;
         }
-        
+
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+          * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+
+        /* Optimize animations */
         @keyframes fadeInUp {
-          from { transform: translateY(60px); opacity: 0; }
+          from { transform: translateY(20px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
         }
-        
-        @keyframes slideInLeft {
-          from { transform: translateX(-100px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideInRight {
-          from { transform: translateX(100px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes scaleIn {
-          from { transform: scale(0.8); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes bounceIn {
-          0% { transform: scale(0.3); opacity: 0; }
-          50% { transform: scale(1.05); opacity: 0.8; }
-          70% { transform: scale(0.9); opacity: 0.9; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes shimmer {
-          0% { background-position: -200px 0; }
-          100% { background-position: calc(200px + 100%) 0; }
-        }
-        
+
         @keyframes pulse {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.05); }
         }
-        
-        @keyframes wiggle {
-          0%, 7%, 14%, 21% { transform: translateX(0); }
-          3.5%, 10.5%, 17.5% { transform: translateX(-2px); }
-        }
 
-        @keyframes slideInFromBottom {
-          from { transform: translateY(30px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes rotateIn {
-          from { transform: rotate(-180deg) scale(0.5); opacity: 0; }
-          to { transform: rotate(0deg) scale(1); opacity: 1; }
-        }
-
-        @keyframes heartbeat {
-          0%, 100% { transform: scale(1); }
-          14% { transform: scale(1.1); }
-          28% { transform: scale(1); }
-          42% { transform: scale(1.1); }
-          70% { transform: scale(1); }
-        }
-        
-        /* Responsive animations */
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        .animate-fade-in-up {
-          animation: fadeInUp 1s ease-out;
-        }
-        
-        .animate-slide-in-left {
-          animation: slideInLeft 1s ease-out;
-        }
-        
-        .animate-slide-in-right {
-          animation: slideInRight 1s ease-out;
-        }
-        
-        .animate-scale-in {
-          animation: scaleIn 1s ease-out;
-        }
-        
-        .animate-bounce-in {
-          animation: bounceIn 1s ease-out;
-        }
-        
-        .animate-shimmer {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-          background-size: 200px 100%;
-          animation: shimmer 2s infinite;
-        }
-        
-        .animate-pulse-custom {
-          animation: pulse 2s infinite;
-        }
-        
-        .animate-wiggle {
-          animation: wiggle 1s ease-in-out infinite;
-        }
-
-        .animate-slide-in-bottom {
-          animation: slideInFromBottom 0.8s ease-out;
-        }
-
-        .animate-rotate-in {
-          animation: rotateIn 1s ease-out;
-        }
-
-        .animate-heartbeat {
-          animation: heartbeat 2s ease-in-out infinite;
-        }
-        
-        /* Enhanced hover effects */
-        .hover-lift {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .hover-lift:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-        
-        .hover-glow:hover {
-          box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
-        }
-        
-        /* Gradient text animation */
-        .gradient-text {
-          background: linear-gradient(-45deg, #ec4899, #f472b6, #f9a8d4, #fbbf24);
-          background-size: 400% 400%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: gradientShift 3s ease infinite;
-        }
-        
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
-        /* Glass morphism effect */
-        .glass {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
         /* Custom scrollbar */
         ::-webkit-scrollbar {
           width: 8px;
         }
-        
+
         ::-webkit-scrollbar-track {
           background: #f1f1f1;
         }
-        
+
         ::-webkit-scrollbar-thumb {
           background: linear-gradient(135deg, #ec4899, #f472b6);
           border-radius: 4px;
         }
-        
+
         ::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(135deg, #db2777, #ec4899);
         }
-        
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-          .animate-float {
-            animation-duration: 4s;
-          }
-          
-          .hover-lift:hover {
-            transform: translateY(-4px) scale(1.01);
-          }
-        }
-        
-        /* Enhanced Testimonial carousel styles */
-        .testimonial-carousel .ant-carousel .slick-dots {
-          bottom: -80px !important;
-          display: flex !important;
-          justify-content: center !important;
-          align-items: center !important;
-        }
-        
-        .testimonial-carousel .ant-carousel .slick-dots li {
-          width: 16px !important;
-          height: 16px !important;
-          margin: 0 8px !important;
-        }
-        
-        .testimonial-carousel .ant-carousel .slick-dots li button {
-          width: 16px !important;
-          height: 16px !important;
-          border-radius: 50% !important;
-          background: linear-gradient(135deg, #ec4899, #f472b6) !important;
-          border: none !important;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-          opacity: 0.4 !important;
-          transform: scale(0.8) !important;
-        }
-        
-        .testimonial-carousel .ant-carousel .slick-dots li.slick-active button {
-          opacity: 1 !important;
-          transform: scale(1.3) !important;
-          box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4) !important;
+
+        /* Optimized hover effects */
+        .hover-lift {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .testimonial-carousel .ant-carousel .slick-dots li:hover button {
-          opacity: 0.8 !important;
-          transform: scale(1.1) !important;
+        .hover-lift:hover {
+          transform: translateY(-4px);
         }
 
-        /* Enhanced card animations for testimonials */
-        .testimonial-carousel .ant-card {
-          border-radius: 24px !important;
-          overflow: hidden !important;
-          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-          border: 2px solid transparent !important;
-          background: linear-gradient(145deg, #ffffff, #fdf2f8) !important;
-          position: relative !important;
+        /* Loading animation */
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
 
-        .testimonial-carousel .ant-card:hover {
-          border-color: rgba(236, 72, 153, 0.2) !important;
-          box-shadow: 0 25px 50px rgba(236, 72, 153, 0.15) !important;
-        }
-
-        .testimonial-carousel .ant-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #ec4899, #f472b6, #f9a8d4);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .testimonial-carousel .ant-card:hover::before {
-          opacity: 1;
-        }
-
-        /* Slide transition effects */
-        .testimonial-carousel .slick-slide {
-          transition: all 0.5s ease !important;
-          opacity: 0.7 !important;
-          transform: scale(0.95) !important;
-        }
-
-        .testimonial-carousel .slick-slide.slick-active {
-          opacity: 1 !important;
-          transform: scale(1) !important;
-        }
-
-        .testimonial-carousel .slick-slide.slick-center {
-          transform: scale(1.05) !important;
-        }
-
-        /* Progress indicator enhancements */
-        .testimonial-carousel-container .progress-indicator {
-          position: absolute;
-          bottom: -120px;
-          left: 50%;
-          transform: translateX(-50%);
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        /* Floating elements animation */
-        @keyframes floatTestimonial {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          25% { transform: translateY(-8px) translateX(2px); }
-          50% { transform: translateY(-4px) translateX(0px); }
-          75% { transform: translateY(-12px) translateX(-2px); }
-        }
-
-        .testimonial-carousel .ant-card .floating-element {
-          animation: floatTestimonial 8s ease-in-out infinite;
-        }
-
-        /* Quote marks styling */
-        .testimonial-quote {
-          position: relative;
-          padding: 0 20px;
-        }
-
-        .testimonial-quote::before,
-        .testimonial-quote::after {
-          font-family: Georgia, serif;
-          font-size: 60px;
-          line-height: 1;
-          position: absolute;
-          color: rgba(236, 72, 153, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .testimonial-quote::before {
-          content: '"';
-          top: -20px;
-          left: -10px;
-        }
-
-        .testimonial-quote::after {
-          content: '"';
-          bottom: -40px;
-          right: -10px;
-          transform: rotate(180deg);
-        }
-
-        .testimonial-carousel .ant-card:hover .testimonial-quote::before,
-        .testimonial-carousel .ant-card:hover .testimonial-quote::after {
-          color: rgba(236, 72, 153, 0.2);
-          transform: scale(1.1);
-        }
-        
-        /* Rate component styling */
-        .ant-rate-star {
-          margin-right: 4px;
-        }
-        
-        /* Enhanced mobile menu */
-        @media (max-width: 1024px) {
-          .mobile-menu-enter {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          
-          .mobile-menu-enter-active {
-            opacity: 1;
-            transform: translateY(0);
-            transition: all 0.3s ease;
-          }
-
-          .testimonial-carousel .ant-carousel .slick-dots {
-            bottom: -60px !important;
-          }
-        }
-
-        /* Auto-play pause indicator */
-        .testimonial-carousel .slick-paused::after {
-          content: '⏸️';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          font-size: 24px;
-          opacity: 0.7;
-          pointer-events: none;
+        .animate-spin {
+          animation: spin 1s linear infinite;
         }
       `}</style>
     </div>
