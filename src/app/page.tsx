@@ -101,6 +101,9 @@ const LittleBitesLanding = () => {
   }, [isLoaded]);
 
 
+  const handleSelectPrivacy = () => {
+    router.push("/privacy");
+  }
   // Memoize static data
   const features = useMemo(() => [
     {
@@ -117,7 +120,7 @@ const LittleBitesLanding = () => {
     },
     {
       icon: <BookFilled className="text-4xl text-purple-500" />,
-      title: "150+ Organic Recipes",
+      title: "300+ Organic Recipes",
       description: "From purees to finger foods, discover natural and irresistible recipes for every stage.",
       color: "from-purple-400 to-indigo-400"
     }
@@ -203,7 +206,7 @@ const LittleBitesLanding = () => {
     third: { transform: `translateY(${scrollY * -0.1}px)` }
   }), [scrollY]);
 
-  const menuItems = ['Home', 'About', 'Recipes', 'Contact'];
+  const menuItems = ['Home', 'About', 'Recipes', 'Contact', 'Privacy Policy'];
 
   if (!isLoaded) {
     return (
@@ -287,25 +290,32 @@ const LittleBitesLanding = () => {
 
               {/* Desktop Menu with Enhanced Animations */}
               <div className="hidden lg:flex items-center space-x-8">
-                {menuItems.map((item, index) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    className="relative text-gray-700 hover:text-pink-600 transition-all duration-400 font-medium group px-3 py-2"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <span className="relative z-10">{item}</span>
+                {menuItems.map((item, index) => {
+                  const isPrivacy = item === "Privacy Policy";
 
-                    {/* Animated underline */}
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-400 group-hover:w-full rounded-full"></span>
+                  return (
+                    <a
+                      key={item}
+                      href={isPrivacy ? undefined : `#${item.toLowerCase()}`}
+                      onClick={
+                        isPrivacy ? () => router.push("/privacy") : undefined
+                      }
+                      className="cursor-pointer relative text-gray-700 hover:text-pink-600 transition-all duration-400 font-medium group px-3 py-2"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <span className="relative z-10">{item}</span>
 
-                    {/* Hover background */}
-                    <span className="absolute inset-0 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 -z-10"></span>
+                      {/* Animated underline */}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-rose-500 transition-all duration-400 group-hover:w-full rounded-full"></span>
 
-                    {/* Floating hearts on hover */}
-                    <Heart className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-3 h-3 text-pink-400 opacity-0 group-hover:opacity-100 group-hover:-translate-y-2 transition-all duration-500" />
-                  </a>
-                ))}
+                      {/* Hover background */}
+                      <span className="absolute inset-0 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 -z-10"></span>
+
+                      {/* Floating hearts on hover */}
+                      <Heart className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-3 h-3 text-pink-400 opacity-0 group-hover:opacity-100 group-hover:-translate-y-2 transition-all duration-500" />
+                    </a>
+                  );
+                })}
               </div>
 
               {/* Enhanced CTA Button */}
@@ -340,27 +350,38 @@ const LittleBitesLanding = () => {
           </div>
 
           {/* Enhanced Mobile Menu */}
-          <div className={`lg:hidden overflow-hidden transition-all duration-500 ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          <div className={`lg:hidden overflow-hidden transition-all duration-500 ${mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
             }`}>
             <div className="bg-white/95 backdrop-blur-xl border-t border-pink-200/50 shadow-inner">
               <div className="px-6 py-6 space-y-4">
-                {menuItems.map((item, index) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    className="block text-gray-700 hover:text-pink-600 transition-all duration-300 font-medium py-3 px-4 rounded-xl hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 hover:scale-105 transform"
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{
-                      animationDelay: `${index * 100}ms`,
-                      animation: mobileMenuOpen ? 'slideInUp 0.5s ease-out forwards' : ''
-                    }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full"></div>
-                      <span>{item}</span>
-                    </div>
-                  </a>
-                ))}
+                <>
+                  {menuItems.map((item, index) => {
+                    const isPrivacy = item === "Privacy Policy";
+
+                    return (
+                      <a
+                        key={item}
+                        href={isPrivacy ? undefined : `#${item.toLowerCase()}`}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          if (isPrivacy) router.push("/privacy");
+                        }}
+                        className="cursor-pointer block text-gray-700 hover:text-pink-600 transition-all duration-300 font-medium py-3 px-4 rounded-xl hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 hover:scale-105 transform"
+                        style={{
+                          animationDelay: `${index * 100}ms`,
+                          animation: mobileMenuOpen
+                            ? "slideInUp 0.5s ease-out forwards"
+                            : "",
+                        }}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full"></div>
+                          <span>{item}</span>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </>
 
                 <button
                   onClick={handleSelect}
@@ -420,6 +441,8 @@ const LittleBitesLanding = () => {
                     Start Your Journey
                   </Button>
                   <Button
+                    onClick={() => router.push("/signup")}
+
                     size="large"
                     className="h-14 px-8 text-lg font-semibold border-2 border-pink-300 text-pink-600 hover:bg-pink-50 transform hover:scale-105 transition-all duration-300 rounded-full"
                     icon={<DownloadOutlined />}
@@ -560,7 +583,7 @@ const LittleBitesLanding = () => {
                         <div className="ml-4">
                           <Title level={4} className="text-gray-800 mb-2">Simple Transition to Solids</Title>
                           <Paragraph className="text-gray-600 leading-relaxed">
-                            Begin with 150+ recipes for purees, smoothies, and finger foods that help the transition.
+                            Begin with 300+ recipes for purees, smoothies, and finger foods that help the transition.
                           </Paragraph>
                         </div>
                       ),
@@ -701,7 +724,7 @@ const LittleBitesLanding = () => {
               </span>
             </div>
 
-            <Title level={2} className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            <Title level={2} className="text-4xl sm:text-5xl font-bold text-white !text-white mb-6">
               Ready to Start Your Baby’s Nutrition Journey?
             </Title>
             <Paragraph className="text-lg sm:text-xl text-pink-100 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -710,11 +733,12 @@ const LittleBitesLanding = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button
+                onClick={() => router.push("/signup")}
                 size="large"
                 className="h-14 px-8 text-lg font-semibold bg-white text-pink-500 border-none shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 rounded-full"
                 icon={<ShoppingCartOutlined />}
               >
-                Get Your Guide Now - $33.99
+                Get Your Guide Now - $34.99
               </Button>
             </div>
 
@@ -787,7 +811,7 @@ const LittleBitesLanding = () => {
                 <Col md={8} sm={12} xs={24}>
                   <Title level={4} className="text-white mb-4 text-lg">Resources</Title>
                   <div className="space-y-3">
-                    {['Baby-Led Weaning', 'Nutrition Tips', 'Safety Guidelines', 'Recipe Book', 'FAQ'].map((resource) => (
+                    {['Baby-Led Weaning', 'Nutrition Tips', 'Safety Guidelines', 'Recipe Book'].map((resource) => (
                       <div key={resource}>
                         <a href="#" className="text-gray-400 hover:text-pink-400 transition-colors duration-300 block">
                           {resource}
@@ -821,9 +845,11 @@ const LittleBitesLanding = () => {
             </Col>
             <Col lg={12} md={24} xs={24} className="text-center lg:text-right">
               <Space className="flex-wrap justify-center lg:justify-end" size="large">
-                <a href="#" className="text-gray-400 hover:text-pink-400 transition-colors text-sm">Privacy Policy</a>
-                <a href="#" className="text-gray-400 hover:text-pink-400 transition-colors text-sm">Terms of Service</a>
-                <a href="#" className="text-gray-400 hover:text-pink-400 transition-colors text-sm">Cookie Policy</a>
+                <a onClick={() => {
+
+                  handleSelectPrivacy();
+                }} className="text-gray-400 hover:text-pink-400 transition-colors text-sm">Privacy Policy</a>
+                <a onClick={() => router.push("/termsandconditions")} href="#" className="cursor-pointer text-gray-400 hover:text-pink-400 transition-colors text-sm">Terms of Service</a>
               </Space>
             </Col>
           </Row>

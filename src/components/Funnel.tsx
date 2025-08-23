@@ -276,47 +276,7 @@ const BabyNutritionFunnel = () => {
                 }
             ]
         },
-        {
-            id: 'budget_range',
-            title: "What's your weekly food budget?",
-            subtitle: "We'll suggest cost-effective nutrition solutions",
-            icon: <Star className="w-6 h-6 sm:w-8 sm:h-8" />,
-            gradient: "from-amber-500 via-yellow-500 to-amber-600",
-            options: [
-                {
-                    value: 'budget',
-                    label: 'Budget-friendly ($20-50)',
-                    emoji: '💰',
-                    description: 'Affordable, nutritious options',
-                    gradient: 'from-green-400 via-teal-400 to-green-500',
-                    glow: 'shadow-green-500/30'
-                },
-                {
-                    value: 'moderate',
-                    label: 'Moderate ($50-100)',
-                    emoji: '💳',
-                    description: 'Balance of quality and cost',
-                    gradient: 'from-blue-400 via-indigo-400 to-blue-500',
-                    glow: 'shadow-blue-500/30'
-                },
-                {
-                    value: 'flexible',
-                    label: 'Flexible ($100+)',
-                    emoji: '✨',
-                    description: 'Premium ingredients welcome',
-                    gradient: 'from-purple-400 via-pink-400 to-purple-500',
-                    glow: 'shadow-purple-500/30'
-                },
-                {
-                    value: 'no_concern',
-                    label: 'Budget not a concern',
-                    emoji: '👑',
-                    description: 'Focus on best nutrition',
-                    gradient: 'from-yellow-400 via-orange-400 to-yellow-500',
-                    glow: 'shadow-yellow-500/30'
-                }
-            ]
-        },
+
         {
             id: 'cooking_confidence',
             title: "How confident are you in the kitchen?",
@@ -351,46 +311,47 @@ const BabyNutritionFunnel = () => {
             ]
         },
         {
-            id: 'support_level',
-            title: "What kind of support would help you most?",
-            subtitle: "We'll provide the guidance that matters to you",
+            id: 'meal_time_challenges',
+            title: "What’s your biggest challenge at mealtimes?",
+            subtitle: "We’ll help you overcome the tricky parts of feeding",
             icon: <Heart className="w-6 h-6 sm:w-8 sm:h-8" />,
             gradient: "from-violet-500 via-purple-500 to-violet-600",
             options: [
                 {
-                    value: 'meal_plans',
-                    label: 'Weekly meal plans',
-                    emoji: '📋',
-                    description: 'Organized schedules & shopping lists',
-                    gradient: 'from-indigo-400 via-blue-400 to-indigo-500',
-                    glow: 'shadow-indigo-500/30'
+                    value: 'mess',
+                    label: 'Too much mess',
+                    emoji: '🧹',
+                    description: 'Struggling with cleanup and food everywhere',
+                    gradient: 'from-orange-400 via-amber-400 to-orange-500',
+                    glow: 'shadow-orange-500/30'
                 },
                 {
-                    value: 'recipes',
-                    label: 'Recipe collections',
-                    emoji: '📚',
-                    description: 'Diverse, age-appropriate recipes',
-                    gradient: 'from-emerald-400 via-teal-400 to-emerald-500',
-                    glow: 'shadow-emerald-500/30'
+                    value: 'time',
+                    label: 'Finding the time',
+                    emoji: '⏰',
+                    description: 'Hard to balance feeding with a busy schedule',
+                    gradient: 'from-blue-400 via-sky-400 to-blue-500',
+                    glow: 'shadow-blue-500/30'
                 },
                 {
-                    value: 'education',
-                    label: 'Nutrition education',
-                    emoji: '🎓',
-                    description: 'Understanding the why behind feeding',
-                    gradient: 'from-purple-400 via-violet-400 to-purple-500',
-                    glow: 'shadow-purple-500/30'
+                    value: 'worry',
+                    label: 'Worry about choking',
+                    emoji: '😰',
+                    description: 'Anxious about safety when baby eats solids',
+                    gradient: 'from-red-400 via-rose-400 to-red-500',
+                    glow: 'shadow-red-500/30'
                 },
                 {
-                    value: 'community',
-                    label: 'Community support',
-                    emoji: '🤝',
-                    description: 'Connect with other parents',
-                    gradient: 'from-pink-400 via-rose-400 to-pink-500',
-                    glow: 'shadow-pink-500/30'
+                    value: 'variety',
+                    label: 'Keeping variety',
+                    emoji: '🥕',
+                    description: 'Running out of ideas for foods to try',
+                    gradient: 'from-green-400 via-emerald-400 to-green-500',
+                    glow: 'shadow-green-500/30'
                 }
             ]
         }
+
     ];
 
     // Generate floating particles
