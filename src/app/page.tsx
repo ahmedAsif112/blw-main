@@ -849,7 +849,7 @@ const LittleBitesLanding = () => {
 
                   handleSelectPrivacy();
                 }} className="text-gray-400 hover:text-pink-400 transition-colors text-sm">Privacy Policy</a>
-                <a onClick={() => router.push("/termsandconditions")} href="#" className="cursor-pointer text-gray-400 hover:text-pink-400 transition-colors text-sm">Terms of Service</a>
+                <a onClick={() => router.push("/termsandconditions")} className="cursor-pointer text-gray-400 hover:text-pink-400 transition-colors text-sm">Terms of Service</a>
               </Space>
             </Col>
           </Row>
