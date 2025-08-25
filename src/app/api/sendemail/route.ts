@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
-            subject: '30 Day Carnivore Diet Mealplan With 6 + Free Bonuses Cookbooks',
+            subject: 'Baby-Led Weaning Meal Plan + 6 Premium BLW Books',
             html: `<p>Hi, hope you are doing well<br /><br/></p>
 
 <div>
