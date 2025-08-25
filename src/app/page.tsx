@@ -26,7 +26,7 @@ import steps from "@/assets/Steps.png"
 import Image from 'next/image';
 
 const { Title, Paragraph, Text } = Typography;
-
+//hello
 const LittleBitesLanding = () => {
   const [isVisible, setIsVisible] = useState({});
   const [scrollY, setScrollY] = useState(0);
