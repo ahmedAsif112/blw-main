@@ -20,8 +20,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'payment',
-      success_url: 'https://www.lifestylecarnivore.com/success',
-      cancel_url: 'https://www.lifestylecarnivore.com/cancel',
+      success_url: 'https://www.earlynourish.com/success',
+      cancel_url: 'https://www.earlynourish.com/cancel',
     });
 
     return NextResponse.json({ url: session.url });
