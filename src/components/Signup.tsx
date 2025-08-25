@@ -298,7 +298,7 @@ export default function SignupScreen() {
                             <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                         </div>
                         <span>Protected by our</span>
-                        <a onClick={() => router.push("/privacy")} className="underline text-gray-300 hover:text-white transition-colors duration-300">
+                        <a onClick={() => router.push("/privacy")} className="cursor-pointer underline text-gray-300 hover:text-white transition-colors duration-300">
                             Privacy Policy
                         </a>
                     </div>
