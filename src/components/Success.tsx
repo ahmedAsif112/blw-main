@@ -178,7 +178,7 @@ export default function SuccessPage() {
                                 </p>
 
                                 <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
-                                    But you can also download it directly from the link below:
+                                    Also you can also download it directly from the link below:
                                 </p>
                             </div>
                         </div>
