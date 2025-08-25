@@ -26,10 +26,28 @@ export async function POST(req: Request) {
             from: process.env.EMAIL_USER,
             to: email,
             subject: '30 Day Carnivore Diet Mealplan With 6 + Free Bonuses Cookbooks',
-            html: `<p>Hi , hope you are well<br /><br/>  <div>
-Here's your Customised Meal-Plan with 6 free Carnivore Cookbooks .
-Here you can Download 
-</div>: <a href="https://drive.google.com/drive/folders/1qZuHN_ZwpYtGDvVnu8--xKddsKK_Ojb_?usp=drive_link">Download PDF</a></p><br /><br /><div>Regards,<br/>Carnivore Diet Representative</div>`,
+            html: `<p>Hi, hope you are doing well<br /><br/></p>
+
+<div>
+We’re excited to share your customised <strong>Baby-Led Weaning Meal-Plan</strong> along with 
+<strong>6 Premium BLW Books</strong> to support your baby’s healthy eating journey.  
+<br /><br/>
+You can download them here:
+</div>
+
+<p>
+  <a href="https://drive.google.com/drive/folders/1A_97bElAj7rubdg06UYPl-Y3jYjibFsn?usp=sharing" target="_blank">
+    📥 Download Meal Plan & Books
+  </a>
+</p>
+
+<br /><br />
+
+<div>
+Best regards,<br/>
+<strong>Baby-Led Weaning Support Team</strong>
+</div>
+`,
             
         });
 
