@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 
-const GA_MEASUREMENT_ID = 'G-80THEGVX29'; // your ID
+const GA_MEASUREMENT_ID = 'G-092JHSXN9V'; // your ID
 
 export default function Analytics() {
     const pathname = usePathname();
