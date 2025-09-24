@@ -35,7 +35,21 @@ export default function PlanPage() {
     const [gender, setGender] = useState<'Male' | 'Female' | ''>('');
     const [particles, setParticles] = useState<Particle[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const handlePaypalCheckout = async () => {
+        const res = await fetch("/api/paypal", { method: "POST" });
 
+        if (!res.ok) {
+            alert("Failed to create PayPal order");
+            return;
+        }
+
+        const data = await res.json();
+        if (data?.url) {
+            window.location.href = data.url; // Redirect to PayPal checkout
+        } else {
+            alert("PayPal order creation failed");
+        }
+    };
     // Generate floating particles
     useEffect(() => {
         const newParticles: Particle[] = Array.from({ length: 15 }, (_, i) => ({
@@ -305,6 +319,12 @@ export default function PlanPage() {
                             </>
                         )}
                     </div>
+                </button>
+                <button
+                    onClick={handlePaypalCheckout}
+                    className="mt-4 w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-full transition"
+                >
+                    Pay with PayPal
                 </button>
 
                 {/* Trust Indicators */}

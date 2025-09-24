@@ -4,7 +4,7 @@ import { prisma } from '../../../../lib/prisma';
 
 export async function POST(req: Request) {
     try {
-        const { email, name } = await req.json();
+        const { email, name , referrer } = await req.json();
         console.log('📥 Incoming email:', email, name);
 
         if (!email) {
@@ -56,7 +56,8 @@ Best regards,<br/>
   data: {
     email,
     status: 'Delivered',
-    site:"BLW" // // ✅ include status here
+    site:"BLW", // // ✅ include status here
+    referrer, // // ✅ include status here
   },
 });
 
