@@ -16,7 +16,7 @@ const plans = [
         id: '4w',
         title: 'Baby Led Weaning Complete Bundle',
         subtitle: 'Everything you need for successful BLW journey',
-        newPrice: '$34.99',
+        newPrice: '$37.99',
         features: [
             '6 Premium BLW Recipe Books',
             'Age-appropriate meal plans',
