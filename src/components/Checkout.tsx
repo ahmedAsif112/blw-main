@@ -1,67 +1,25 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Crown, Sparkles, Heart, Book, Star, CheckCircle, Clock, Zap } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Crown, Timer, CheckCircle, BookOpen, Star } from 'lucide-react';
 
-interface Particle {
-    id: number;
-    x: number;
-    y: number;
-    size: number;
-    delay: number;
-    duration: number;
-}
-
-const plans = [
-    {
-        id: '4w',
-        title: 'Baby Led Weaning Complete Bundle',
-        subtitle: 'Everything you need for successful BLW journey',
-        newPrice: '$34.99',
-        features: [
-            '6 Premium BLW Recipe Books',
-            'Age-appropriate meal plans',
-            'Safety guidelines & tips',
-            'Nutritional guidance',
-            'Finger food recipes',
-            'Allergen introduction guide'
-        ]
-    },
-];
-
-export default function PlanPage() {
-    const [selectedPlan, setSelectedPlan] = useState('4w');
+export default function BLWPlanPage() {
     const [timeLeft, setTimeLeft] = useState(10 * 60);
     const [email, setEmail] = useState('');
-    const [gender, setGender] = useState<'Male' | 'Female' | ''>('');
-    const [particles, setParticles] = useState<Particle[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [gender, setGender] = useState('');
+
     const handlePaypalCheckout = async () => {
         const res = await fetch("/api/paypal", { method: "POST" });
-
         if (!res.ok) {
             alert("Failed to create PayPal order");
             return;
         }
-
         const data = await res.json();
         if (data?.url) {
-            window.location.href = data.url; // Redirect to PayPal checkout
+            window.location.href = data.url;
         } else {
             alert("PayPal order creation failed");
         }
     };
-    // Generate floating particles
-    useEffect(() => {
-        const newParticles: Particle[] = Array.from({ length: 15 }, (_, i) => ({
-            id: i,
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            size: Math.random() * 4 + 1,
-            delay: Math.random() * 4,
-            duration: Math.random() * 8 + 12,
-        }));
-        setParticles(newParticles);
-    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -74,7 +32,7 @@ export default function PlanPage() {
         const storedEmail = localStorage?.getItem('userEmail');
         const storedGender = localStorage?.getItem('gender');
         if (storedEmail) setEmail(storedEmail);
-        if (storedGender === 'Male' || storedGender === 'Female') setGender(storedGender);
+        if (storedGender) setGender(storedGender);
     }, []);
 
     const formatTime = () => {
@@ -86,273 +44,213 @@ export default function PlanPage() {
     const genderLabel = gender === 'Female' ? 'moms' : 'parents';
 
     const handleCheckout = async () => {
-        setIsLoading(true);
+        const res = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ planId: '4w', email }),
+        });
 
-        // Simulate API call with animation
-        setTimeout(async () => {
-            try {
-                const res = await fetch('/api/checkout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ planId: selectedPlan }),
-                });
+        if (!res.ok) {
+            alert('Failed to create payment session');
+            return;
+        }
 
-                if (!res.ok) {
-                    alert('Failed to create payment session');
-                    setIsLoading(false);
-                    return;
-                }
+        let data;
+        try {
+            data = await res.json();
+        } catch (err) {
+            alert('Invalid server response. Please try again.');
+            return;
+        }
 
-                let data;
-                try {
-                    data = await res.json();
-                } catch (err) {
-                    alert('Invalid server response. Please try again.');
-                    setIsLoading(false);
-                    return;
-                }
-
-                if (data?.url) {
-                    window.location.href = data.url;
-                } else {
-                    alert('Payment session creation failed.');
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                alert('An error occurred. Please try again.');
-                setIsLoading(false);
-            }
-        }, 1000);
+        if (data?.url) {
+            window.location.href = data.url;
+        } else {
+            alert('Payment session creation failed.');
+        }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-            {/* Animated Background Elements */}
-            <div className="fixed inset-0 pointer-events-none">
-                {/* Floating Particles */}
-                {particles.map((particle) => (
+        <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-purple-800 relative overflow-hidden">
+            {/* Floating particles */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {[...Array(20)].map((_, i) => (
                     <div
-                        key={particle.id}
-                        className="absolute w-1 h-1 sm:w-2 sm:h-2 bg-gradient-to-r from-pink-400 to-violet-400 rounded-full opacity-30"
+                        key={i}
+                        className="absolute w-1 h-1 bg-white rounded-full opacity-20"
                         style={{
-                            left: `${particle.x}%`,
-                            top: `${particle.y}%`,
-                            animationDelay: `${particle.delay}s`,
-                            animationDuration: `${particle.duration}s`,
-                            animation: 'float infinite ease-in-out'
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out`,
+                            animationDelay: `${Math.random() * 5}s`
                         }}
                     />
                 ))}
-
-                {/* Animated Gradients */}
-                <div className="absolute top-0 -right-4 w-72 h-72 bg-gradient-to-br from-pink-400/20 to-violet-600/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-                <div className="absolute -top-4 -left-4 w-72 h-72 bg-gradient-to-br from-cyan-400/20 to-emerald-600/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }}></div>
-                <div className="absolute bottom-0 left-20 w-72 h-72 bg-gradient-to-br from-orange-400/20 to-pink-600/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{ animationDelay: '4s' }}></div>
             </div>
 
-            {/* Timer Header */}
-            <div className="sticky top-0 z-50 w-full bg-gradient-to-r from-pink-500/90 via-violet-500/90 to-cyan-500/90 backdrop-blur-md border-b border-white/10 text-white text-center py-2 sm:py-3 text-xs sm:text-sm font-medium shadow-2xl">
-                <div className="flex items-center justify-center space-x-1 sm:space-x-2 px-2">
-                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 animate-pulse" />
-                    <span className="text-xs sm:text-sm">Limited Time Offer expires in: </span>
-                    <span className="font-bold bg-white/20 px-2 sm:px-3 py-1 rounded-full backdrop-blur-sm text-xs sm:text-sm">
+            {/* Timer Bar */}
+            <div className="sticky top-0 z-50 w-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 text-white text-center py-3 shadow-lg">
+                <div className="flex items-center justify-center space-x-2">
+                    <Timer className="w-4 h-4" />
+                    <span className="text-sm font-medium">Limited Time Offer expires in:</span>
+                    <span className="font-bold bg-white/20 px-3 py-1 rounded-full">
                         {formatTime()}
                     </span>
-                    <Zap className="w-3 h-3 sm:w-4 sm:h-4 animate-bounce text-yellow-300" />
+                    <span className="text-yellow-300">⚡</span>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="relative z-10 max-w-2xl mx-auto px-3 sm:px-4 pt-4 sm:pt-8 pb-16 sm:pb-24">
-
-                {/* Header with Brand */}
-                <div className="text-center mb-6 sm:mb-8">
-                    <div className="flex items-center justify-center mb-4 sm:mb-6">
-                        <div className="relative">
-                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full flex items-center justify-center shadow-2xl shadow-pink-500/30 mr-3 sm:mr-4">
-                                <span className="text-lg sm:text-2xl">🍼</span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full animate-ping opacity-20"></div>
-                            </div>
+            <div className="relative z-10 max-w-2xl mx-auto px-4 pt-8 pb-16">
+                {/* Logo Section */}
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center space-x-3">
+                        <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-xl">
+                            <span className="text-2xl">🍼</span>
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-pink-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
-                            Little Bites
-                        </h1>
+                        <h1 className="text-3xl font-bold text-white">Little Bites</h1>
                     </div>
                 </div>
 
-                {/* Personalization Card */}
-                <div className="bg-gradient-to-br from-purple-500/90 via-violet-500/90 to-purple-700/90 backdrop-blur-md border border-white/10 text-white rounded-3xl p-6 text-center mb-8 shadow-2xl shadow-purple-500/30 transform hover:scale-105 transition-all duration-500 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-violet-600/20 animate-pulse"></div>
-
-                    <div className="relative z-10">
-                        <div className="bg-purple-800/50 backdrop-blur-sm px-4 py-2 rounded-full inline-block mb-4 text-sm border border-white/20">
-                            <div className="flex items-center space-x-2">
-                                <Heart className="w-4 h-4 animate-pulse text-pink-300" />
-                                <span>{email || 'Welcome Parent!'}</span>
-                            </div>
+                {/* Email Card */}
+                <div className="bg-gradient-to-br from-purple-500/90 to-purple-600/90 backdrop-blur-md rounded-3xl p-6 mb-8 shadow-2xl">
+                    <div className="text-center">
+                        <div className="inline-flex items-center bg-purple-600/50 px-4 py-2 rounded-full mb-4">
+                            <span className="text-white text-sm">💌 {email || 'ahmeddeveloper112@gmail.com'}</span>
                         </div>
 
-                        <h2 className="text-xl font-semibold mb-4 flex items-center justify-center space-x-2">
-                            <Crown className="w-6 h-6 text-yellow-300" />
+                        <h2 className="text-xl font-bold text-white mb-4 flex items-center justify-center space-x-2">
+                            <Crown className="w-5 h-5 text-yellow-300" />
                             <span>Your Personalized BLW Plan is Ready</span>
-                            <Sparkles className="w-6 h-6 text-cyan-300 animate-spin" />
+                            <span className="text-lg">🎊</span>
                         </h2>
 
-                        <div className="grid grid-cols-1 gap-2 text-sm text-left max-w-md mx-auto">
-                            {[
-                                `Perfect for ${genderLabel} starting BLW journey`,
-                                'Age-appropriate nutrition guidance',
-                                'Safe finger food introduction',
-                                'Allergen management support'
-                            ].map((feature, index) => (
-                                <div key={index} className="flex items-center space-x-2 opacity-90" style={{ animationDelay: `${index * 200}ms` }}>
-                                    <CheckCircle className="w-4 h-4 text-green-300 flex-shrink-0 animate-pulse" />
-                                    <span>{feature}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bundle Showcase */}
-                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 mb-8 transform hover:bg-white/10 transition-all duration-500 shadow-2xl relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-violet-500/5 animate-pulse"></div>
-
-                    <div className="relative z-10 text-center">
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            {Array.from({ length: 6 }).map((_, i) => (
-                                <div key={i} className="bg-gradient-to-br from-pink-400/20 to-violet-400/20 backdrop-blur-sm rounded-2xl p-4 border border-white/10 transform hover:scale-105 transition-all duration-500 hover:shadow-lg" style={{ animationDelay: `${i * 100}ms` }}>
-                                    <Book className="w-8 h-8 text-white mx-auto mb-2 animate-pulse" />
-                                    <p className="text-white text-xs font-medium">BLW Guide {i + 1}</p>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 backdrop-blur-sm rounded-2xl p-6 border border-yellow-400/30">
-                            <h3 className="text-2xl font-bold text-white mb-2 flex items-center justify-center space-x-2">
-                                <Star className="w-6 h-6 text-yellow-300 animate-bounce" />
-                                <span>Bundle of Six BLW Books</span>
-                                <Star className="w-6 h-6 text-yellow-300 animate-bounce" style={{ animationDelay: '0.5s' }} />
-                            </h3>
-                            <p className="text-white/80 text-lg">Complete Baby Led Weaning Resource Collection</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Plan Selection */}
-                <h3 className="text-xl font-bold mb-6 text-center text-white">Get visible results with our complete plan</h3>
-
-                <div className="space-y-4 mb-8">
-                    {plans.map((plan) => (
-                        <label
-                            key={plan.id}
-                            className={`group block cursor-pointer transform transition-all duration-500 hover:scale-105 ${selectedPlan === plan.id ? 'scale-105' : ''
-                                }`}
-                        >
-                            <div className={`relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-md border transition-all duration-500 p-6 ${selectedPlan === plan.id
-                                ? 'border-pink-500/50 bg-white/10 shadow-2xl shadow-pink-500/20'
-                                : 'border-white/10 hover:border-white/20 hover:bg-white/8'
-                                }`}>
-                                {/* Glow effect */}
-                                <div className={`absolute inset-0 bg-gradient-to-r from-pink-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${selectedPlan === plan.id ? 'opacity-100' : ''
-                                    }`}></div>
-
-                                <div className="relative z-10">
-                                    <div className="flex items-start gap-4">
-                                        <input
-                                            type="radio"
-                                            name="plan"
-                                            checked={selectedPlan === plan.id}
-                                            onChange={() => setSelectedPlan(plan.id)}
-                                            className="mt-2 w-5 h-5 accent-pink-500 cursor-pointer"
-                                        />
-
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <h4 className="font-bold text-white text-lg">{plan.title}</h4>
-                                                <div className="text-right">
-                                                    <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-violet-400">
-                                                        {plan.newPrice}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <p className="text-white/70 text-sm mb-4">{plan.subtitle}</p>
-
-                                            <div className="grid grid-cols-1 gap-2">
-                                                {plan.features.map((feature, index) => (
-                                                    <div key={index} className="flex items-center space-x-2 text-sm text-white/80">
-                                                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                                                        <span>{feature}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div className="space-y-2 text-left max-w-md mx-auto">
+                            <div className="flex items-center space-x-2 text-white text-sm">
+                                <CheckCircle className="w-4 h-4 text-green-300 flex-shrink-0" />
+                                <span>Perfect for {genderLabel} starting BLW journey</span>
                             </div>
-                        </label>
-                    ))}
+                            <div className="flex items-center space-x-2 text-white text-sm">
+                                <CheckCircle className="w-4 h-4 text-green-300 flex-shrink-0" />
+                                <span>Age-appropriate nutrition guidance</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-white text-sm">
+                                <CheckCircle className="w-4 h-4 text-green-300 flex-shrink-0" />
+                                <span>Safe finger food introduction</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-white text-sm">
+                                <CheckCircle className="w-4 h-4 text-green-300 flex-shrink-0" />
+                                <span>Allergen management support</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 6 Guide Boxes */}
+                <div className="bg-gradient-to-br from-purple-900/50 to-purple-800/50 backdrop-blur-sm rounded-3xl p-6 mb-8">
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        {[1, 2, 3, 4, 5, 6].map((num) => (
+                            <div key={num} className="bg-gradient-to-br from-purple-500/60 to-pink-500/60 backdrop-blur-sm rounded-2xl p-6 text-center">
+                                <BookOpen className="w-10 h-10 text-white mx-auto mb-2" />
+                                <p className="text-white font-medium text-sm">BLW Guide {num}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Bundle Box */}
+                    <div className="bg-gradient-to-br from-pink-300/30 to-rose-300/30 backdrop-blur-sm rounded-2xl p-6 text-center border border-yellow-300/30">
+                        <h3 className="text-white font-bold text-lg flex items-center justify-center space-x-2">
+                            <Star className="w-5 h-5 text-yellow-300" />
+                            <span>Bundle of Six BLW Books</span>
+                            <Star className="w-5 h-5 text-yellow-300" />
+                        </h3>
+                        <p className="text-white/90 text-sm mt-1">Complete Baby Led Weaning Resource Collection</p>
+                    </div>
+                </div>
+
+                {/* Special Offer Title */}
+                <div className="text-center mb-8">
+                    <div className="flex items-center justify-center space-x-2 mb-3">
+                        <span className="text-3xl">🔥</span>
+                        <h2 className="text-3xl font-extrabold bg-gradient-to-r from-orange-400 via-red-400 to-yellow-400 bg-clip-text text-transparent">
+                            Special Checkout Offer
+                        </h2>
+                        <span className="text-3xl">🔥</span>
+                    </div>
+                    <p className="text-white text-lg mb-2">
+                        Get your <span className="font-semibold">4-Week Baby Led Weaning Bundle</span> for just
+                    </p>
+                    <div className="text-5xl font-bold">
+                        <span className="bg-gradient-to-r from-orange-400 via-red-400 to-yellow-400 bg-clip-text text-transparent">$34.99</span>
+                        <span className="text-gray-400 line-through text-2xl ml-2">($197)</span>
+                        <span className="text-green-400 text-2xl ml-2">— an insane 82% OFF!</span>
+                    </div>
+                </div>
+
+                {/* Offer Box */}
+                <div className="relative border border-purple-500/40 rounded-3xl p-8 bg-gradient-to-br from-purple-900/60 via-pink-900/40 to-purple-800/60 backdrop-blur-md shadow-2xl mb-6 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-pink-500/10 to-purple-500/10 blur-xl"></div>
+
+                    <ul className="space-y-4 relative z-10">
+                        <li className="flex items-start space-x-3">
+                            <div className="relative">
+                                <CheckCircle className="w-6 h-6 text-green-400 animate-ping absolute opacity-75" />
+                                <CheckCircle className="w-6 h-6 text-green-400 relative" />
+                            </div>
+                            <span className="text-gray-200 text-base leading-snug">
+                                <span className="font-bold text-white">Only $34.99</span> for your 4-week customized BLW plan
+                            </span>
+                        </li>
+
+                        <li className="flex items-start space-x-3">
+                            <div className="relative">
+                                <span className="text-2xl">🎁</span>
+                            </div>
+                            <span className="text-gray-200 text-base leading-snug">
+                                After purchase, you'll unlock <span className="font-bold text-white">6+ Premium BLW eBooks</span> — <span className="text-yellow-300 font-extrabold">FREE Bonus!</span>
+                            </span>
+                        </li>
+                    </ul>
+
+                    <div className="text-center mt-6 relative z-10">
+                        <p className="text-base font-medium bg-gradient-to-r from-purple-200 via-pink-200 to-yellow-200 bg-clip-text text-transparent">
+                            🍼 Don't miss out — start your baby's nutrition journey the right way!
+                        </p>
+                    </div>
                 </div>
 
                 {/* Checkout Button */}
                 <button
                     onClick={handleCheckout}
-                    disabled={isLoading}
-                    className="group relative w-full bg-gradient-to-r from-pink-500 via-violet-500 to-cyan-500 hover:from-pink-600 hover:via-violet-600 hover:to-cyan-600 text-white font-bold py-4 rounded-full transition-all duration-500 shadow-2xl shadow-pink-500/30 hover:shadow-pink-500/50 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden text-lg"
+                    className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-500 text-white font-bold py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl mb-4 flex items-center justify-center space-x-2"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-violet-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <Crown className="w-5 h-5" />
+                    <span>Get My BLW Bundle Now</span>
+                    <span>🎁</span>
+                </button>
 
-                    <div className="relative z-10 flex items-center justify-center space-x-3">
-                        {isLoading ? (
-                            <>
-                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                <span>Processing...</span>
-                            </>
-                        ) : (
-                            <>
-                                <Crown className="w-6 h-6 group-hover:animate-bounce" />
-                                <span>Get My BLW Bundle Now</span>
-                                <Sparkles className="w-6 h-6 group-hover:animate-spin" />
-                            </>
-                        )}
-                    </div>
-                </button>
-                <button
-                    onClick={handlePaypalCheckout}
-                    className="mt-4 w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-full transition"
-                >
-                    Pay with PayPal
-                </button>
+
 
                 {/* Trust Indicators */}
-                <div className="mt-8 text-center">
-                    <div className="flex items-center justify-center space-x-6 text-white/60 text-sm">
-                        <div className="flex items-center space-x-1">
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                            <span>Secure Payment</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                            <span>Instant Access</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                            <span>Expert Approved</span>
-                        </div>
+                <div className="mt-6 flex items-center justify-center space-x-6 text-white/70 text-sm">
+                    <div className="flex items-center space-x-1">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <span>Secure Payment</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <span>Instant Access</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <span>Expert Approved</span>
                     </div>
                 </div>
             </div>
 
-            {/* Custom Styles */}
             <style jsx>{`
                 @keyframes float {
-                    0%, 100% { transform: translateY(0px) rotate(0deg); }
-                    25% { transform: translateY(-10px) rotate(90deg); }
-                    50% { transform: translateY(-20px) rotate(180deg); }
-                    75% { transform: translateY(-10px) rotate(270deg); }
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-20px); }
                 }
             `}</style>
         </div>

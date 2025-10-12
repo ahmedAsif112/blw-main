@@ -1,5 +1,5 @@
 'use client';
-
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { CheckCircle, Download, Heart, Gift, Crown, Mail, Baby, Sparkles } from 'lucide-react';
 
@@ -13,13 +13,15 @@ interface Particle {
 }
 
 export default function SuccessPage() {
+    const searchParams = useSearchParams();
+    const sessionId = searchParams.get('session_id');
     const [emailSent, setEmailSent] = useState(false);
     const [loading, setLoading] = useState(true);
     const [isVisible, setIsVisible] = useState(false);
     const [referrer, setReferrer] = useState<string | null>(null);
     const [particles, setParticles] = useState<Particle[]>([]);
     const hasSent = useRef(false);
-
+    const router = useRouter();
     // Generate floating particles for background animation
     useEffect(() => {
         const newParticles: Particle[] = Array.from({ length: 15 }, (_, i) => ({
@@ -34,6 +36,10 @@ export default function SuccessPage() {
     }, []);
 
     useEffect(() => {
+        if (!sessionId) {
+            router.push("/")
+            return;
+        }
         setIsVisible(true);
 
         // Only run in the browser
@@ -50,7 +56,7 @@ export default function SuccessPage() {
             fetch('/api/sendemail', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, referrer: savedRef }),
+                body: JSON.stringify({ email, referrer: savedRef, sessionId }),
             })
                 .then((res) => res.json())
                 .then((data) => {
@@ -61,9 +67,16 @@ export default function SuccessPage() {
                 .catch((err) => {
                     console.error('Email send failed:', err);
                     setLoading(false);
+                    router.push('/');
                 });
         }
-    }, []);
+    }, [sessionId, router]);
+    useEffect(() => {
+        if (sessionId === null) return; // wait for hydration
+        if (!sessionId) router.push('/');
+    }, [sessionId, router]);
+
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden relative">

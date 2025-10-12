@@ -38,7 +38,7 @@ export async function POST() {
                     {
                         amount: {
                             currency_code: "USD",
-                            value: "34.99",
+                            value: "34yarn dev.99",
                         },
                     },
                 ],

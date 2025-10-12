@@ -42,7 +42,7 @@ const BabyNutritionFunnel = () => {
 
     const router = useRouter();
     const handleSelect = () => {
-        router.push("/signup");
+        router.push("/checkout");
     };
     // Define questions array at the top
     const questions: Question[] = [
@@ -654,14 +654,52 @@ const BabyNutritionFunnel = () => {
                         </div>
 
                         <h2 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-pink-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent mb-4 sm:mb-6 animate-pulse">
-                            Perfect! 🎉
+                            Perfect!
                         </h2>
-                        <p className="text-lg sm:text-2xl text-white/80 mb-8 sm:mb-12">
-                            We’re preparing your personalized nutrition guide...
-                        </p>
+                        <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6 mb-8 sm:mb-12">
+                            <p className="text-xl sm:text-3xl font-bold text-white leading-relaxed">
+                                Your baby's unique nutrition roadmap is ready!
+                            </p>
+                            <p className="text-base sm:text-lg text-white/90 leading-relaxed">
+                                Based on your answers, we've crafted a <span className="text-pink-400 font-semibold">personalized baby-led weaning plan</span> designed specifically for your {selectedAnswers.baby_age?.label || 'little one'}'s developmental stage.                            </p>
+                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
+                                <p className="text-sm sm:text-base text-white/95 mb-3 sm:mb-4 font-medium">
+                                    Your custom plan includes:
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-left text-sm sm:text-base">
+                                    <div className="flex items-start space-x-2">
+                                        <span className="text-pink-400 mt-1">✓</span>
+                                        <span className="text-white/90">Age-appropriate meal progressions</span>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                        <span className="text-violet-400 mt-1">✓</span>
+                                        <span className="text-white/90">Safe food textures & sizes</span>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                        <span className="text-cyan-400 mt-1">✓</span>
+                                        <span className="text-white/90">Allergy introduction schedule</span>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                        <span className="text-pink-400 mt-1">✓</span>
+                                        <span className="text-white/90">Weekly meal plans & recipes</span>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                        <span className="text-violet-400 mt-1">✓</span>
+                                        <span className="text-white/90">Nutritional milestone tracking</span>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                        <span className="text-cyan-400 mt-1">✓</span>
+                                        <span className="text-white/90">Expert feeding guidance 24/7</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-base sm:text-lg text-pink-300 font-semibold animate-pulse">
+                                Join 10,000+ confident parents who've mastered BLW! 💝
+                            </p>
+
+                        </div>
 
                         <button onClick={() => {
-
                             handleSelect();
                         }} className="group relative inline-flex items-center space-x-2 sm:space-x-3 px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-r from-pink-500 via-violet-500 to-cyan-500 text-white text-lg sm:text-xl font-semibold rounded-full shadow-2xl shadow-pink-500/30 hover:shadow-pink-500/50 transform hover:scale-105 transition-all duration-500 overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-violet-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -672,6 +710,8 @@ const BabyNutritionFunnel = () => {
                     </div>
                 )}
             </div>
+
+            {/* Custom Styles */}
 
             {/* Custom Styles */}
             <style jsx>{`
