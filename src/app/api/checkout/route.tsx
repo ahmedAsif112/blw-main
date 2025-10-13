@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       line_items: [
         {
           // price: 'price_1SGJdjBTtdntfEmTBmNBEstD', test
-          price: 'price_1RnCLcBTtdntfEmTuPipNFWP', // ✅ make sure this price ID is correct
+          price: 'price_1SHuPbBTtdntfEmTvfPGuAWl', // ✅ make sure this price ID is correct
           quantity: 1,
         },
       ],

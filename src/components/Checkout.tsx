@@ -180,9 +180,9 @@ export default function BLWPlanPage() {
                         Get your <span className="font-semibold">4-Week Baby Led Weaning Bundle</span> for just
                     </p>
                     <div className="text-5xl font-bold">
-                        <span className="bg-gradient-to-r from-orange-400 via-red-400 to-yellow-400 bg-clip-text text-transparent">$34.99</span>
+                        <span className="bg-gradient-to-r from-orange-400 via-red-400 to-yellow-400 bg-clip-text text-transparent">$18.99</span>
                         <span className="text-gray-400 line-through text-2xl ml-2">($197)</span>
-                        <span className="text-green-400 text-2xl ml-2">— an insane 82% OFF!</span>
+                        <span className="text-green-400 text-2xl ml-2">— an insane 90.26% OFF!</span>
                     </div>
                 </div>
 
@@ -197,7 +197,7 @@ export default function BLWPlanPage() {
                                 <CheckCircle className="w-6 h-6 text-green-400 relative" />
                             </div>
                             <span className="text-gray-200 text-base leading-snug">
-                                <span className="font-bold text-white">Only $34.99</span> for your 4-week customized BLW plan
+                                <span className="font-bold text-white">Only $18.99</span> for your 4-week customized BLW plan
                             </span>
                         </li>
 
