@@ -230,7 +230,7 @@ const LittleBitesFunnelPage = () => {
                   {/* Main Visual */}
                   <div className="relative mb-8">
                     <Image
-                      src={collage}
+                      src={Mother}
                       alt="Premium ribeye steak"
                       className="w-full h-64 sm:h-80 object-contain rounded-2xl shadow-2xl bg-white"
                     />
