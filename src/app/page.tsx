@@ -225,6 +225,7 @@ const LittleBitesFunnelPage = () => {
               </div>
 
               {/* Hero Visual */}
+              {/* hello world */}
               <div className={`relative transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                 <div className="relative bg-gradient-to-br from-pink-50 to-rose-50 rounded-3xl p-8 backdrop-blur-sm border border-pink-200/50">
                   {/* Main Visual */}
